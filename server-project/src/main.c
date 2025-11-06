@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "header.h"
+#include "protocol.h"
 
 #define NO_ERROR 0
 
