@@ -18,14 +18,14 @@ Il repository è organizzato in due progetti Eclipse CDT separati:
 │   ├── .cproject           # Configurazione Eclipse CDT
 │   └── src/
 │       ├── main.c          # File principale del client
-│       └── header.h        # Header con definizioni e prototipi
+│       └── protocol.h      # Header con definizioni e prototipi
 │
 └── server-project/         # Progetto Eclipse per il server
     ├── .project            # Configurazione progetto Eclipse
     ├── .cproject           # Configurazione Eclipse CDT
     └── src/
         ├── main.c          # File principale del server
-        └── header.h        # Header con definizioni e prototipi
+        └── protocol.h      # Header con definizioni e prototipi
 ```
 
 ## Come Utilizzare il Template
@@ -70,7 +70,7 @@ Per compilare su Windows, è necessario linkare la libreria Winsock:
 
 ## File Principali
 
-### header.h
+### protocol.h
 Contiene:
 - **Costanti condivise**: numero di porta del server, dimensione buffer, ecc.
 - **Prototipi delle funzioni**: inserire qui le firme di tutte le funzioni implementate
@@ -94,13 +94,13 @@ Contiene:
 
 Gli studenti devono:
 
-1. **Definire i parametri** nel file `header.h`:
+1. **Definire i parametri** nel file `protocol.h`:
    - Numero di porta dell'applicazione
    - Dimensione dei buffer
    - Altre costanti necessarie
 
 2. **Implementare le funzioni** necessarie:
-   - Aggiungere i prototipi nel file `header.h`
+   - Aggiungere i prototipi nel file `protocol.h`
    - Implementare le funzioni nel file `main.c`
 
 3. **Completare il codice** seguendo le sezioni TODO:
@@ -109,7 +109,7 @@ Gli studenti devono:
 
 ## Note Importanti
 
-- Utilizzare le costanti definite in `header.h` invece di valori hardcoded
+- Utilizzare le costanti definite in `protocol.h` invece di valori hardcoded
 
 ## Licenza
 
