@@ -84,11 +84,11 @@ I formati di output rimangono **identici** al primo esonero:
 
 **Flusso operativo:**
 1. Analizza argomenti da linea di comando
-2. Crea socket UDP (SOCK_DGRAM)
-3. Invia richiesta al server con `sendto()`
+2. Crea socket UDP 
+3. Invia richiesta al server
 4. Attende risposta con timeout (3 secondi)
 5. In caso di timeout, ritrasmette la richiesta (massimo 3 tentativi totali)
-6. Riceve risposta con `recvfrom()`
+6. Riceve risposta
 7. Visualizza risultato formattato
 8. Chiude socket
 
