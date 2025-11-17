@@ -39,9 +39,8 @@ struct request {
 ```
 
 **Note di validazione:**
-- Il campo `city` ha una lunghezza massima di 64 caratteri (incluso il terminatore `\0`)
-- **Validazione lato client**: Il client deve verificare che il nome della città non superi 63 caratteri prima di inviare la richiesta
-- Il campo `city` può contenere spazi multipli, ma **non ammette caratteri di tabulazione** (`\t`)
+- Il campo `city` ha una lunghezza massima di 64 caratteri,  incluso il terminatore `\0` (la verifica è a carico del client prima di inviare la richiesta)
+- Il campo `city` può contenere spazi multipli, ma non ammette caratteri di tabulazione (`\t`)
 
 **Risposta Server:**
 ```c
@@ -77,7 +76,9 @@ I formati di output rimangono **identici** al primo esonero:
 - `-s server`: indirizzo server (default: localhost)
 - `-p port`: porta server (default: 56700)
 - `-r request`: richiesta meteo obbligatoria (formato: `"type city"`)
-  - **Importante**: La stringa della richiesta può contenere spazi multipli, ma **non ammette caratteri di tabulazione** (`\t`)
+
+**Note di validazione:**
+- La stringa della richiesta può contenere spazi multipli, ma **non ammette caratteri di tabulazione** (`\t`)
 
 **Flusso operativo:**
 1. Analizza argomenti da linea di comando
@@ -108,7 +109,7 @@ Il server rimane attivo continuamente in ascolto sulla porta specificata. Per og
 **Note:**
 - Non c'è fase di "connessione" o "accettazione" come in TCP
 - Ogni richiesta è indipendente e stateless
-- **Il server non termina autonomamente**: rimane in esecuzione indefinitamente e può essere interrotto solo forzatamente tramite **Ctrl+C** (SIGINT)
+- Il server non termina autonomamente, rimane in esecuzione indefinitamente e può essere interrotto solo forzatamente tramite **Ctrl+C** (SIGINT)
 
 ## Funzioni di Generazione Dati
 
@@ -141,11 +142,9 @@ Le città supportate rimangono **identiche** al primo esonero. Il server deve ri
 
 ### 2. Portabilità Multi-Piattaforma
 Il codice deve compilare ed eseguire correttamente su:
-- Windows (utilizzare Winsock2)
+- Windows
 - Linux
 - macOS
-
-Utilizzare direttive di preprocessore (`#ifdef _WIN32`) per gestire le differenze tra piattaforme.
 
 ### 3. Gestione Memoria e Sicurezza
 - Nessun buffer overflow
@@ -154,12 +153,12 @@ Utilizzare direttive di preprocessore (`#ifdef _WIN32`) per gestire le differenz
 - Gestione appropriata degli errori di sistema
 
 ### 4. Risoluzione Nomi DNS
-- **IMPORTANTE**: Il client deve utilizzare "localhost" come indirizzo predefinito invece di 127.0.0.1
+- Il client deve utilizzare `localhost' come indirizzo predefinito invece di `127.0.0.1`
 - Questo requisito permette di sfruttare le funzioni di risoluzione dei nomi DNS del sistema operativo
-- Il codice deve supportare sia nomi simbolici (es. "localhost", "example.com") che indirizzi IP diretti (es. "127.0.0.1", "192.168.1.1")
+- Il codice deve supportare sia nomi simbolici (es. `localhost`, `example.com`) che indirizzi IP  (es. `127.0.0.1`, `192.168.1.1`)
 
 ### 5. Compatibilità Eclipse CDT
-Il progetto deve essere compatibile con Eclipse CDT e includere i file di configurazione necessari (.project, .cproject).
+Il progetto deve essere compatibile con Eclipse CDT e includere i file di configurazione necessari (`.project`, `.cproject`).
 
 ## Consegna
 
