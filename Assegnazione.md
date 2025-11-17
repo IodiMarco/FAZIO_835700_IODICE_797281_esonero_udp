@@ -135,7 +135,7 @@ Le città supportate rimangono **identiche** al primo esonero. Il server deve ri
 ## Requisiti Tecnici
 
 ### 1. Organizzazione del Codice
-- **File header `protocol.h`**: riutilizzare lo stesso file del primo esonero, che contiene le definizioni delle strutture dati (`struct request`, `struct response`), i prototipi delle funzioni e le costanti condivise tra client e server
+- **File header** `protocol.h`: riutilizzare lo stesso file del primo esonero, che contiene le definizioni delle strutture dati (`struct request`, `struct response`), i prototipi delle funzioni e le costanti condivise tra client e server
 - **File sorgente client**: `client.c` nell'apposita directory - modificare solo le parti relative ai socket
 - **File sorgente server**: `server.c` nell'apposita directory - modificare solo le parti relative ai socket
 
@@ -167,6 +167,6 @@ Il progetto deve essere compatibile con Eclipse CDT e includere i file di config
 - **Form di prenotazione / consegna**: [link](https://forms.gle/...)
 - **Formato**: Link a repository GitHub accessibile pubblicamente
 - **Note**:
-   - Una sola consegna per coppia. Le coppie non si possono modificare. Al limite i due partecipanti di una coppia possono decidere di effettuare esonero UDP da soli.
+   - Una sola consegna per coppia. Le coppie non si possono modificare. Al limite i due partecipanti di una coppia possono decidere di effettuare l'esonero UDP da soli.
  
 _Ver. 1.0.0_
