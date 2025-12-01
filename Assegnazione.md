@@ -76,9 +76,11 @@ memcpy(&value, &temp, sizeof(float));
 
 ### Formati di Output
 
-I formati di output rimangono **identici** al primo esonero.
-
-**IMPORTANTE**: Il formato dell'output deve essere **ESATTAMENTE** come specificato. Messaggio in italiano, senza caratteri extra.
+> [!WARNING]
+> - Il formato dell'output deve essere **ESATTAMENTE** come specificato di seguito
+> - **Lingua italiana obbligatoria** - NON tradurre in inglese o altre lingue
+->  **NO caratteri extra** (es. "Received result from server IP" invece di "Ricevuto risultato dal server ip")
+> - Gli **spazi e la punteggiatura** devono corrispondere esattamente agli esempi
 
 **Successo (`status=0`):**
 - Temperatura: `"NomeCittà: Temperatura = XX.X°C"`
@@ -109,6 +111,7 @@ I formati di output rimangono **identici** al primo esonero.
 **Note di validazione:**
 - La stringa della richiesta può contenere spazi multipli, ma **non ammette caratteri di tabulazione** (`\t`)
 - Per il parsing della richiesta: il primo carattere specifica il `type`, tutto il resto (dopo lo spazio) è da considerarsi come `city`
+- Sono accettati entrambi i casi di spelling dei **caratteri accentati** (e.g., Umidita' e Umidità sono entrambi validi)
 - Esempio: `-r "p Reggio Calabria"` → type='p', city="Reggio Calabria"
 
 **Flusso operativo:**
@@ -130,7 +133,7 @@ Dove `[messaggio]` varia in base allo status della risposta (vedi sezione "Forma
 
 **Esempio di output completo:**
 ```
-Ricevuto risultato dal server 127.0.0.1. Roma: Temperatura = 23.5°C
+Ricevuto risultato dal server localhost (ip: 127.0.0.1). Roma: Temperatura = 23.5°C
 ```
 
 ## Interfaccia Server
@@ -157,7 +160,7 @@ Il server deve stampare a console un log per ogni richiesta ricevuta, includendo
 
 **Esempio di log:**
 ```
-Richiesta ricevuta da 127.0.0.1: type='t', city='Roma'
+Richiesta ricevuta da localhost (ip: 127.0.0.1): type='t', city='Roma'
 ```
 
 **Note:**
@@ -196,9 +199,8 @@ Le città supportate rimangono **identiche** al primo esonero. Il server deve ri
 ## Requisiti Tecnici
 
 ### 1. Organizzazione del Codice
-- **File header** `protocol.h`: riutilizzare lo stesso file del primo esonero, che contiene le definizioni delle strutture dati (`struct request`, `struct response`), i prototipi delle funzioni e le costanti condivise tra client e server
-- **File sorgente client**: `client.c` nell'apposita directory - modificare solo le parti relative ai socket
-- **File sorgente server**: `server.c` nell'apposita directory - modificare solo le parti relative ai socket
+- Non modificare struttura del progetto (cartelle e nomi dei file esistenti)
+- Potete aggiungere nuovi file .h e .c se necessario
 
 ### 2. Portabilità Multi-Piattaforma
 Il codice deve compilare ed eseguire correttamente su:
@@ -212,11 +214,9 @@ Il codice deve compilare ed eseguire correttamente su:
 ### 4. Risoluzione Nomi DNS
 - Il client deve utilizzare `localhost` come indirizzo predefinito invece di `127.0.0.1`
 - Questo requisito permette di sfruttare le funzioni di risoluzione dei nomi DNS del sistema operativo
-- Il codice deve supportare sia nomi simbolici (es. `localhost`, `example.com`) che indirizzi IP  (es. `127.0.0.1`, `192.168.1.1`)
+- Il codice deve supportare **sia nomi simbolici** (es. `localhost`, `example.com`) che **indirizzi IP**  (es. `127.0.0.1`, `192.168.1.1`)
 
-### 5. Gestione Memoria e Sicurezza
-- Nessun buffer overflow
-- Nessun memory leak
+### 5. Gestione Errori
 - Validazione corretta degli input utente
 - Gestione appropriata degli errori di sistema
 - **Validazione lunghezza nome città (lato client)**: se il nome della città supera 64 caratteri, il client deve troncare la stringa a 63 caratteri (lasciando spazio per il null-terminator) oppure segnalare un errore all'utente prima dell'invio
@@ -230,6 +230,9 @@ Il progetto deve essere compatibile con Eclipse CDT e includere i file di config
 - **Form di prenotazione / consegna**: [link](https://forms.gle/P4kWH3M3zjXjsWWP7)
 - **Formato**: Link a repository GitHub accessibile pubblicamente
 - **Note**:
-   - Una sola consegna per coppia. Le coppie non si possono modificare. Al limite i due partecipanti di una coppia possono decidere di effettuare l'esonero UDP da soli.
+   - Una sola consegna per coppia.
+   - Le coppie non si possono modificare, al limite i due partecipanti di una coppia possono decidere di effettuare l'esonero UDP da soli.
+   - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository 
+   - La pagina dei risultati si aggiorna ogni ora, scaricando l'ultima versione di ciascun progetto fino alla scadenza.
  
 _Ver. 1.0.0_
