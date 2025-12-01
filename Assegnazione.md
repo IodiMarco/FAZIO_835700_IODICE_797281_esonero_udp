@@ -124,11 +124,9 @@ Il client deve stampare l'indirizzo IP del server (risultato della risoluzione D
 
 > [!NOTE]
 > **Risoluzione DNS del server (client):**
-> - Il campo `<nomeserver>` deve essere ottenuto tramite **reverse DNS lookup** dell'indirizzo IP del server
+> - I valori `<nomeserver>` e `<IP>` dono essere ottenuti tramite le funzioni di **DNS lookup**
 > - Se l'utente specifica `-s localhost`, il client risolve `localhost` → `127.0.0.1` e poi fa reverse lookup `127.0.0.1` → `localhost`
 > - Se l'utente specifica `-s 127.0.0.1`, il client fa reverse lookup `127.0.0.1` → `localhost`
-> - Utilizzare `getnameinfo()` per ottenere il nome host dall'indirizzo IP
-> - Se il reverse lookup fallisce, utilizzare l'indirizzo IP come nome host
 
 ### Esempi di Output
 
