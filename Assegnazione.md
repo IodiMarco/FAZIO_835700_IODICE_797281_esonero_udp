@@ -38,6 +38,15 @@ struct request {
 };
 ```
 
+> [!NOTE]
+> **Valori validi per il campo `type`:**
+> - `'t'` = temperatura
+> - `'h'` = umidità
+> - `'w'` = vento
+> - `'p'` = pressione
+>
+> **Qualsiasi altro carattere** è considerato **richiesta invalida** e deve generare `status=2` nella risposta del server.
+
 **Risposta Server:**
 ```c
 struct response {
@@ -54,20 +63,39 @@ struct response {
 > - **`unsigned int status`**: usare `htonl()` prima dell'invio e `ntohl()` dopo la ricezione
 > - **`float value`**: convertire in formato network byte order usando la tecnica mostrata a lezione (conversione `float` → `uint32_t` → `htonl/ntohl` → `float`)
 > - **`char type` e `char city[]`**: essendo campi a singolo byte, non richiedono conversione
+>
+> **IMPORTANTE - Serializzazione manuale obbligatoria:**
+> - **NON inviate le struct direttamente** con `sendto(&request, sizeof(request), ...)` o `sendto(&response, sizeof(response), ...)`
+> - Il compilatore può aggiungere **padding** tra i campi della struct, causando problemi di portabilità
+> - **Dovete creare un buffer separato** e copiare manualmente i campi uno per uno, come mostrato a lezione
+> - Esempio: creare un `char buffer[...]` e copiare i campi in sequenza dopo averli convertiti in network byte order
 
-Esempio conversione float (come mostrato a lezione):
+Esempio conversione float e serializzazione (come mostrato a lezione):
 ```c
-// Invio: float -> network byte order
-uint32_t temp;
-memcpy(&temp, &value, sizeof(float));
-temp = htonl(temp);
-memcpy(&response.value, &temp, sizeof(float));
+// Invio response: serializzazione in buffer separato
+char buffer[sizeof(uint32_t) + sizeof(char) + sizeof(float)];
+int offset = 0;
 
-// Ricezione: network byte order -> float
+// Serializza status (con network byte order)
+uint32_t net_status = htonl(response.status);
+memcpy(buffer + offset, &net_status, sizeof(uint32_t));
+offset += sizeof(uint32_t);
+
+// Serializza type (1 byte, no conversione)
+memcpy(buffer + offset, &response.type, sizeof(char));
+offset += sizeof(char);
+
+// Serializza value (float con network byte order)
 uint32_t temp;
 memcpy(&temp, &response.value, sizeof(float));
-temp = ntohl(temp);
-memcpy(&value, &temp, sizeof(float));
+temp = htonl(temp);
+memcpy(buffer + offset, &temp, sizeof(float));
+offset += sizeof(float);
+
+// Invio del buffer
+sendto(sock, buffer, offset, 0, ...);
+
+// Ricezione e deserializzazione analoga
 ```
 
 ### Formati di Output
@@ -95,8 +123,12 @@ Il client deve stampare l'indirizzo IP del server (risultato della risoluzione D
 - `status 2`: `"Ricevuto risultato dal server <nomeserver> (ip <IP>). Richiesta non valida"`
 
 > [!NOTE]
-> Il campo `<IP>` rappresenta l'indirizzo IP del server ottenuto tramite risoluzione di <nomeserver> da DNS e viceversa.
-> Ad esempio, se il client usa `-s localhost` (o il default), l'IP visualizzato sarà `127.0.0.1`.
+> **Risoluzione DNS del server (client):**
+> - Il campo `<nomeserver>` deve essere ottenuto tramite **reverse DNS lookup** dell'indirizzo IP del server
+> - Se l'utente specifica `-s localhost`, il client risolve `localhost` → `127.0.0.1` e poi fa reverse lookup `127.0.0.1` → `localhost`
+> - Se l'utente specifica `-s 127.0.0.1`, il client fa reverse lookup `127.0.0.1` → `localhost`
+> - Utilizzare `getnameinfo()` per ottenere il nome host dall'indirizzo IP
+> - Se il reverse lookup fallisce, utilizzare l'indirizzo IP come nome host
 
 ### Esempi di Output
 
@@ -144,9 +176,11 @@ Ricevuto risultato dal server localhost (ip 127.0.0.1). Richiesta non valida
 
 **Note di parsing richiesta:**
 - La stringa della richiesta può contenere spazi multipli, ma **non ammette caratteri di tabulazione** (`\t`)
-- Per il parsing della richiesta: il primo carattere specifica il `type`, tutto il resto (dopo lo spazio) è da considerarsi come `city`
+- Per il parsing della richiesta: **il primo token (prima dello spazio) deve essere un singolo carattere** che specifica il `type`, tutto il resto (dopo lo spazio) è da considerarsi come `city`
+- **Se il primo token contiene più di un carattere** (es. `-r "temp bari"`), il client **deve segnalare un errore e NON inviare** la richiesta
 - Sono accettati entrambi i casi di spelling dei **caratteri accentati** (e.g., Umidita' e Umidità sono entrambi validi)
-- Esempio: `-r "p Reggio Calabria"` → type='p', city="Reggio Calabria"
+- Esempio valido: `-r "p Reggio Calabria"` → type='p', city="Reggio Calabria"
+- Esempio invalido: `-r "temp roma"` → errore lato client (primo token non è un singolo carattere)
 
 **Flusso operativo:**
 1. Analizza argomenti da linea di comando
@@ -176,12 +210,18 @@ Il server rimane attivo continuamente in ascolto sulla porta specificata. Per og
 
 **Logging delle Richieste:**
 
-Il server deve stampare a console un log per ogni richiesta ricevuta, includendo l'indirizzo IP del client.
+Il server deve stampare a console un log per ogni richiesta ricevuta, includendo sia il nome host che l'indirizzo IP del client.
 
 **Esempio di log:**
 ```
 Richiesta ricevuta da localhost (ip 127.0.0.1): type='t', city='Roma'
 ```
+
+> [!NOTE]
+> **Risoluzione DNS del client (server):**
+> - Il server deve ottenere il nome host del client tramite **reverse DNS lookup** del suo indirizzo IP
+> - Utilizzare `getnameinfo()` sull'indirizzo acquisito da `recvfrom()`
+> - Se il reverse lookup fallisce, utilizzare l'indirizzo IP come nome host nel log
 
 **Note:**
 - Non c'è fase di "connessione" o "accettazione" come in TCP
@@ -212,8 +252,8 @@ Le città supportate rimangono **identiche** al primo esonero. Il server deve ri
 
 **Note sulla validazione nomi città:**
 - Le città possono contenere spazi singoli (es. "San Marino")
-- Le città con **spazi multipli consecutivi** sono gestite normalizzando gli spazi (es. "San  Marino" → "San Marino")
-- **Caratteri speciali** (es. @, #, $, %, ecc.) e **caratteri di tabulazione** non sono ammessi e devono causare un errore di validazione
+- **Gli spazi multipli consecutivi NON vengono normalizzati**: la stringa viene trattata così com'è (es. "San  Marino" con due spazi probabilmente non verrà riconosciuta e darà `status=1`)
+- **Caratteri speciali** (es. @, #, $, %, ecc.) e **caratteri di tabulazione** non sono ammessi e devono causare un errore di validazione (`status=2`)
 - Il confronto rimane case-insensitive (es. "bari", "BARI", "Bari" sono tutti validi)
 
 ## Requisiti Tecnici
@@ -234,16 +274,14 @@ Il codice deve compilare ed eseguire correttamente su:
 - Durante la serializzazione e deserializzazione delle strutture dati, è necessario gestire opportunamente il network byte order in base al tipo del campo
 
 ### 4. Risoluzione Nomi DNS
-- Il client deve utilizzare `localhost` come indirizzo predefinito invece di `127.0.0.1`
-- Questo requisito permette di sfruttare le funzioni di risoluzione dei nomi DNS del sistema operativo
-- Il codice deve supportare **sia nomi simbolici** (es. `localhost`, `example.com`) che **indirizzi IP**  (es. `127.0.0.1`, `192.168.1.1`)
+Il codice deve supportare **sia nomi simbolici** (es. `localhost`) che **indirizzi IP** (es. `127.0.0.1`) come parametro `-s` del client. Vedere le note nelle sezioni "Formati di Output" e "Logging delle Richieste" per i dettagli sulla risoluzione e reverse lookup DNS
 
 ### 5. Gestione Memoria e Sicurezza
 - Nessun buffer overflow
 - Nessun memory leak
 - Validazione corretta degli input utente
 - Gestione appropriata degli errori di sistema
-- **Validazione lunghezza nome città (lato client)**: se il nome della città supera 64 caratteri, il client deve troncare la stringa a 63 caratteri (lasciando spazio per il null-terminator) oppure segnalare un errore all'utente prima dell'invio
+- **Validazione lunghezza nome città (lato client)**: se il nome della città supera 63 caratteri (64 incluso il null-terminator), il client **deve segnalare un errore all'utente e NON inviare** la richiesta al server
 
 ### 6. Compatibilità Eclipse CDT
 Il progetto deve essere compatibile con Eclipse CDT e includere i file di configurazione necessari (`.project`, `.cproject`).
