@@ -309,10 +309,11 @@ Il progetto deve essere compatibile con Eclipse CDT e includere i file di config
 - **Scadenza**: 21 dicembre 2025, entro le ore 23.59.59
 - **Form di prenotazione / consegna**: [link](https://forms.gle/P4kWH3M3zjXjsWWP7)
 - **Formato**: Link a repository GitHub accessibile pubblicamente
+- **Risultati**: [link](https://collab-uniba.github.io/correzione_esonero_reti_udp_itps_A-L_25-26/aggregate-report.html)
 - **Note**:
    - Una sola consegna per coppia.
    - Le coppie non si possono modificare, al limite i due partecipanti di una coppia possono decidere di effettuare l'esonero UDP da soli.
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
    - La pagina dei risultati si aggiorna ogni ora, scaricando l'ultima versione di ciascun progetto fino alla scadenza.
 
-_Ver. 1.0.0_
+_Ver. 1.0.1_
