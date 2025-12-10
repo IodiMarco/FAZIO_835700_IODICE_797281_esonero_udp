@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
     offset += sizeof(char);
 
     memset(send_buffer + offset, 0, MAX_CITY_LEN);
-    strncpy(send_buffer + offset, city, MAX_CITY_LEN - 1);
+    strcpy(send_buffer + offset, city);
     offset += MAX_CITY_LEN;
 
     // --- 4. INVIO ---

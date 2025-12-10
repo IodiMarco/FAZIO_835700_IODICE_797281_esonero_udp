@@ -71,4 +71,8 @@ static inline void clearwinsock() {
 #endif
 }
 
+#if defined WIN32
+    #define strcasecmp _stricmp
+#endif
+
 #endif /* PROTOCOL_H_ */
