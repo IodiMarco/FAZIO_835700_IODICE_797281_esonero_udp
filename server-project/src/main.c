@@ -114,9 +114,9 @@ int main(int argc, char* argv[]) {
         // 4. LOGICA DI RISPOSTA
         weather_response_t response;
         memset(&response, 0, sizeof(response));
-        response.type = request.type; // Echo del tipo
+        response.type = request.type;
 
-        // Validazione validità caratteri
+        // Validazione caratteri
         if (!is_valid_city_string(request.city)) {
              response.status = STATUS_INVALID_REQUEST;
         }

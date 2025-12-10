@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[]) {
     int server_port = SERVER_PORT;
-    char* server_addr_str = "localhost"; // Default host
+    char* server_addr_str = "localhost";
     char type = 0;
     char city[MAX_CITY_LEN] = "";
     int city_set = 0;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
     struct hostent *he;
     struct sockaddr_in server_addr;
 
-    // Risoluzione nome (gestisce sia "localhost" che IP stringhe)
+    // Risoluzione nome
     if ((he = gethostbyname(server_addr_str)) == NULL) {
         printf("Errore risoluzione host: %s\n", server_addr_str);
         clearwinsock();
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
 
     // --- 7. OUTPUT ---
 
-    // Ottenere IP in stringa
+    // IP in stringa
     char server_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(from_addr.sin_addr), server_ip, INET_ADDRSTRLEN);
 
@@ -170,7 +170,6 @@ int main(int argc, char* argv[]) {
         strcpy(server_name, server_ip);
     }
 
-    // Prefisso stringa standard
     printf("Ricevuto risultato dal server %s (ip %s). ", server_name, server_ip);
 
     if (response.status == STATUS_CITY_NOT_FOUND) {
